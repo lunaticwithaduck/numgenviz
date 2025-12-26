@@ -4,6 +4,12 @@ interface SidePanelProps {
   onGridSizeChange: (size: number) => void;
   selectedGenerator: string;
   onGeneratorChange: (generator: string) => void;
+  generatorParams: any;
+  onParameterChange: (
+    generatorType: string,
+    paramName: string,
+    value: number | number[]
+  ) => void;
 }
 
 export default function SidePanel({
@@ -12,6 +18,8 @@ export default function SidePanel({
   onGridSizeChange,
   selectedGenerator,
   onGeneratorChange,
+  generatorParams,
+  onParameterChange,
 }: SidePanelProps) {
   const handleMouseEnter = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.currentTarget.style.backgroundColor = "#005a99";
@@ -34,10 +42,60 @@ export default function SidePanel({
     onGeneratorChange(e.target.value);
   };
 
+  const renderParameterInputs = () => {
+    const params = generatorParams[selectedGenerator];
+    if (!params) return null;
+
+    return Object.entries(params).map(([key, value]) => {
+      if (Array.isArray(value)) {
+        // Handle array parameters (like seeds for laggedFibonacci)
+        return (
+          <div key={key} style={sidePanelStyles.section}>
+            <label style={sidePanelStyles.label}>
+              {key}: [{value.slice(0, 3).join(", ")}...] ({value.length} items)
+            </label>
+            <input
+              type="number"
+              value={value[0]}
+              onChange={(e) => {
+                const newValue = parseInt(e.target.value) || 0;
+                const newArray = Array.from(
+                  { length: value.length },
+                  (_, i) => newValue + i
+                );
+                onParameterChange(selectedGenerator, key, newArray);
+              }}
+              style={sidePanelStyles.input}
+              placeholder={`First ${key} value`}
+            />
+          </div>
+        );
+      } else {
+        // Handle number parameters
+        return (
+          <div key={key} style={sidePanelStyles.section}>
+            <label style={sidePanelStyles.label}>
+              {key}: {String(value)}
+            </label>
+            <input
+              type="number"
+              value={value as number}
+              onChange={(e) => {
+                const newValue = parseInt(e.target.value) || 0;
+                onParameterChange(selectedGenerator, key, newValue);
+              }}
+              style={sidePanelStyles.input}
+            />
+          </div>
+        );
+      }
+    });
+  };
+
   const generatorOptions = [
     { value: "lcg", label: "Linear Congruential Generator (LCG)" },
     { value: "xorshift", label: "XORShift" },
-    { value: "middleSquare", label: "Middle Square Method" },
+    { value: "lfsr", label: "Linear Feedback Shift Register (LFSR)" },
     { value: "additiveCongruential", label: "Additive Congruential" },
     { value: "combinedLCG", label: "Combined LCG" },
     {
@@ -45,6 +103,9 @@ export default function SidePanel({
       label: "Multiplicative Congruential",
     },
     { value: "laggedFibonacci", label: "Lagged Fibonacci" },
+    { value: "parkMiller", label: "Park-Miller Generator" },
+    { value: "well512", label: "Well512 Generator" },
+    { value: "xoshiro128", label: "Xoshiro128+ Generator" },
   ];
 
   return (
@@ -74,6 +135,12 @@ export default function SidePanel({
             </option>
           ))}
         </select>
+      </div>
+
+      {/* Parameter inputs for the selected generator */}
+      <div style={sidePanelStyles.section}>
+        <h4 style={sidePanelStyles.label}>Parameters:</h4>
+        {renderParameterInputs()}
       </div>
 
       <div style={sidePanelStyles.section}>

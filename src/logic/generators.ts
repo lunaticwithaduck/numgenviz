@@ -23,17 +23,18 @@ export function* xorshift(seed: number): Generator<number> {
   }
 }
 
-// middle square method generator
-export function* middleSquare(seed: number): Generator<number> {
-  let state = Math.abs(seed) % 100000000;
-  if (state === 0) state = 12345678;
+// linear feedback shift register generator
+export function* lfsr(seed: number, taps = 0xb400): Generator<number> {
+  let state = seed >>> 0;
+  if (state === 0) state = 1;
   while (true) {
-    const squared = (state * state).toString().padStart(16, "0");
-    const middle = squared.slice(4, 12);
-    state = parseInt(middle);
-    if (state === 0) {
-      state = 12345678;
+    let bit = 0;
+    let temp = state & taps;
+    while (temp) {
+      bit ^= temp & 1;
+      temp >>>= 1;
     }
+    state = (state >>> 1) | (bit << 15);
     yield state;
   }
 }
@@ -100,5 +101,61 @@ export function* laggedFibonacci(
     buffer[index % k] = next;
     yield next;
     index++;
+  }
+}
+
+// Park-Miller generator (minimal standard)
+export function* parkMiller(seed: number): Generator<number> {
+  let state = seed >>> 0;
+  if (state === 0) state = 1;
+  while (true) {
+    state = (16807 * state) % 2147483647;
+    yield state;
+  }
+}
+
+// Well512 generator (simplified version)
+export function* well512(seed: number): Generator<number> {
+  const state = new Array(16);
+  let index = 0;
+  for (let i = 0; i < 16; i++) {
+    state[i] = (seed + i * 1812433253) >>> 0;
+  }
+
+  while (true) {
+    const a = state[index];
+    const c = state[(index + 13) & 15];
+    const b = a ^ c ^ (a << 16) ^ (c << 15);
+    const d = state[(index + 9) & 15] ^ (b >>> 11);
+    state[index] = d;
+    index = (index + 15) & 15;
+    yield d;
+  }
+}
+
+// Simple Xoshiro128+ generator
+export function* xoshiro128(
+  seed1: number = 1,
+  seed2: number = 2,
+  seed3: number = 3,
+  seed4: number = 4
+): Generator<number> {
+  let s0 = seed1 >>> 0;
+  let s1 = seed2 >>> 0;
+  let s2 = seed3 >>> 0;
+  let s3 = seed4 >>> 0;
+
+  const rotl = (x: number, k: number) => ((x << k) | (x >>> (32 - k))) >>> 0;
+
+  while (true) {
+    const result = (s0 + s3) >>> 0;
+    const t = (s1 << 9) >>> 0;
+    s2 ^= s0;
+    s3 ^= s1;
+    s1 ^= s2;
+    s0 ^= s3;
+    s2 ^= t;
+    s3 = rotl(s3, 11);
+    yield result;
   }
 }
