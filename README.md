@@ -1,75 +1,54 @@
-# React + TypeScript + Vite
+### _Pseudo-Random Number Generator Visualizer_
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+> A real-time interactive visualization tool for exploring the visual patterns and statistical properties of different PRNG algorithms.
 
-Currently, two official plugins are available:
+![NumGenViz Screenshot](screenshot.png)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Features
 
-## React Compiler
+- **Real-time Visualization** - See randomness patterns as grayscale grids
+- **Full Parameter Control** - Customize every algorithm parameter
+- **Interactive Regeneration** - Instantly rerender with new parameters
+- **Dynamic Grid Sizing** - Scale visualization from 10x10 to 200x200
+- **High Performance** - Built with React, TypeScript, and Canvas rendering
 
-The React Compiler is enabled on this template. See [this documentation](https://react.dev/learn/react-compiler) for more information.
+## Supported Algorithms
 
-Note: This will impact Vite dev & build performances.
+| Generator                                 | Type              | Key Features                                |
+| ----------------------------------------- | ----------------- | ------------------------------------------- |
+| **Linear Congruential (LCG)**             | Classic           | Customizable multiplier, increment, modulus |
+| **XORShift**                              | Bit-shift         | Fast, simple operations                     |
+| **Linear Feedback Shift Register (LFSR)** | Hardware          | Configurable tap polynomials                |
+| **Additive Congruential**                 | Fibonacci-like    | Dual seed system                            |
+| **Combined LCG**                          | Enhanced LCG      | Better statistical properties               |
+| **Multiplicative Congruential**           | Simple LCG        | Minimal parameter set                       |
+| **Lagged Fibonacci**                      | Complex state     | Long period, 55-element buffer              |
+| **Park-Miller**                           | Industry standard | Minimal standard generator                  |
+| **Well512**                               | Modern            | High-quality equidistribution               |
+| **Xoshiro128+**                           | State-of-the-art  | Excellent performance and quality           |
 
-## Expanding the ESLint configuration
+## Usage
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+1. **Select Generator**: Choose any PRNG algorithm from the dropdown
+2. **Adjust Parameters**: Fine-tune algorithm-specific parameters in real-time
+3. **Set Grid Size**: Control visualization resolution (10-200)
+4. **Generate**: Click "Rerender Grid" to visualize the current configuration
+5. **Explore**: Compare different algorithms and parameter combinations
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## Visualization Details
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+Each pixel in the grid represents one generated number:
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+- **Black pixels**: Lower values (approaching 0)
+- **White pixels**: Higher values (approaching maximum)
+- **Gray scale**: Full spectrum of generated values normalized to 0-255
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Patterns reveal the statistical properties and potential biases of each algorithm.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## Technology Stack
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+- **React 18** - Modern UI framework
+- **TypeScript** - Type-safe development
+- **Vite** - Lightning-fast build tool
+- **Canvas API** - High-performance rendering
+- **CSS-in-JS** - Component-scoped styling
